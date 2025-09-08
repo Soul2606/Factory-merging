@@ -1,0 +1,13 @@
+body{
+	color: white;
+	background-color: rgb(53, 54, 56);
+}
+
+.factory-pathway{
+	width: 500px;
+	height: 500px;
+	border: solid white 1px;
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	grid-template-rows: repeat(5, 1fr);
+}
