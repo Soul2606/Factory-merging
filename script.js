@@ -149,7 +149,30 @@ class Factory {
 
 
 /**
- * @typedef {{target:string, slot:number, weight?:number}[][]} Route
+ * A single routing instruction.
+ * A Split sends some fraction of a Lane’s output to a target node.
+ * 
+ * @typedef {Object} Split
+ * @property {string} target  - ID of the node this split routes to
+ * @property {number} slot    - Input slot index on the target node
+ * @property {number} [weight] - Optional weight for weighted branching (defaults to 1)
+ */
+/**
+ * A Lane contains one or more Splits that divide that lane’s output.
+ * 
+ * @typedef {Split[]} Lane
+ */
+/**
+ * A Route is the full routing table for a factory.
+ * The array is supposed to correlate with some array or output stream from a factory
+ * 
+ * @typedef {Lane[]} Route
+ */
+
+/**
+ * @typedef {object} PathwayInput
+ * @property {string[]} inputItemsId 
+ * @property {Route} route 
  */
 /**
  * @typedef {object} PathwayNode
@@ -160,7 +183,7 @@ class Factory {
  */
 /**
  * @typedef {object} Pathway
- * @property {{inputItemsId:string[], route:Route}} input
+ * @property {PathwayInput} input
  * @property {PathwayNode[]} nodes 
  */
 
