@@ -167,10 +167,12 @@ class Factory {
 
 
 // Factory pathway
-const pathway = {
+const pathway1 = {
 	input:{
-		inputItemsId:['stone', 'sand', 'clay'],
+		inputItemsId:['stone', 'stone'],
 		route:[[
+			{target:'crush1', slot:0},
+		],[
 			{target:'crush1', slot:0},
 		]]
 	},
@@ -207,6 +209,32 @@ const pathway2 = {
 }
 
 const pathway3 = {
+	input:{
+		inputItemsId:['stone', 'dirt', 'clay'],
+		route:[[
+			{target:'crush', slot:1},
+			{target:'crush', slot:0},
+		],[
+			{target:'crush', slot:0},
+			{target:'crush', slot:0},
+			{target:'crush', slot:2},
+		]]
+	},
+	nodes:[
+		{
+			id:'crush',
+			process:'crush',
+			route:[[
+				{target:'output', slot:0},
+			],[
+				{target:'output', slot:1},
+				{target:'output', slot:0},
+			]]
+		}
+	]
+}
+
+const pathway4 = {
 	input:{
 		inputItemsId:['water'],
 		route:[[
@@ -329,10 +357,10 @@ function calculate(pathway, factories) {
 			if (inputReceivingNodes.includes(node.id)) {
 
 				console.log('true')
-				const routedToThisSlot = pathway.input.route.map(r=>r.filter(r=>r.slot===slot && r.target===node.id))
+				const routedToThisSlot = pathway.input.route.map(r=>r.find(r=>r.slot===slot && r.target===node.id)) // Use find to remove redundant "same lane splitting"
 				console.log('routedToThisSlot', routedToThisSlot)
-				if (routedToThisSlot.some((v,i)=>pathway.input.inputItemsId[i] !== input.id && v.length > 0)) {
-					errors.push(`Node '${node.id}' is receiving incorrect item '${routedToThisSlot.map((v,i)=>pathway.input.inputItemsId[i]).filter(v=>v !== input.id)}' from pathway input for slot '${slot}'`)
+				if (routedToThisSlot.some((v,i)=>pathway.input.inputItemsId[i] !== input.id && v)) {
+					errors.push(`Node '${node.id}' is receiving incorrect item '${routedToThisSlot.map((v,i)=>pathway.input.inputItemsId[i]).filter(v=>v)}' from pathway input for slot '${slot}'`)
 					continue
 				}
 				let amountToAdd
@@ -341,9 +369,10 @@ function calculate(pathway, factories) {
 				} else {
 					amountToAdd = Fraction.from(inAmount)
 				}
+				const divisor = routedToThisSlot.filter(r=>r).length
 				for (let i = 0; i < routedToThisSlot.length; i++) {
 					const r = routedToThisSlot[i]
-					if (r.length > 0) pathwayInputAmounts[i].add(Fraction.from(amountToAdd).divide(r.length))
+					if (r) pathwayInputAmounts[i].add(Fraction.from(amountToAdd).divide(divisor))
 				}
 
 			} else {
@@ -369,7 +398,7 @@ function calculate(pathway, factories) {
 }
 
 
-console.log('errors',...Object.values(calculate(pathway2, [
+console.log('errors',...Object.values(calculate(pathway1, [
 	new Factory('crush', 1, [new Item('stone', 1)], [new Item('gravel', 1)]),
 	new Factory('smelt', 1, [new Item('gravel', 1), new Item('coal', 1)], [new Item('stone', 1)])
 ])))
